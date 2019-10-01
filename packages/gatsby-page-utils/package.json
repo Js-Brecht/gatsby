@@ -22,7 +22,7 @@
   "dependencies": {
     "@babel/runtime": "^7.6.2",
     "bluebird": "^3.5.5",
-    "chokidar": "git+https://github.com/paulmillr/chokidar.git",
+    "chokidar": "git://github.com/paulmillr/chokidar.git",
     "fs-exists-cached": "^1.0.0",
     "glob": "^7.1.4",
     "lodash": "^4.17.15",
