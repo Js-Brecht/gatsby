@@ -19,7 +19,7 @@ exports.createPagesStatefully = async ({ store, actions }, options, done) => {
       component: destination,
       path: `/dev-404-page/`,
     })
-    report.log(`dev-404-page: start chokidar.watch() instance`)
+    report.log(`dev-404-page: start chokidar.watch() instance, wait for ready`)
     chokidar
       .watch(source)
       .on(`change`, () => {

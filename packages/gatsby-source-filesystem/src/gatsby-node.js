@@ -160,7 +160,9 @@ See docs here - https://www.gatsbyjs.org/packages/gatsby-source-filesystem/
     fsMachine.send(`BOOTSTRAP_FINISHED`)
   })
 
-  report.log(`gatsby-source-filesystem: start chokidar.watch() instance`)
+  report.log(
+    `gatsby-source-filesystem: start chokidar.watch() instance, wait for ready`
+  )
   const watcher = chokidar.watch(pluginOptions.path, {
     ignored: [
       `**/*.un~`,

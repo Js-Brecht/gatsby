@@ -5,7 +5,9 @@ const report = require(`gatsby-cli/lib/reporter`)
 
 module.exports = async (path, glob, onNewFile, onRemovedFile) =>
   new Promise((resolve, reject) => {
-    report.log(`gatsby-page-utils: start chokidar.watch() instance`)
+    report.log(
+      `gatsby-page-utils: start chokidar.watch() instance, wait for ready`
+    )
     chokidar
       .watch(glob, { cwd: path })
       .on(`add`, path => {
