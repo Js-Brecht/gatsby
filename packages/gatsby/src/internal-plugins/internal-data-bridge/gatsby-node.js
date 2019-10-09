@@ -2,6 +2,7 @@ const moment = require(`moment`)
 const chokidar = require(`chokidar`)
 const systemPath = require(`path`)
 const _ = require(`lodash`)
+const report = require(`gatsby-cli/lib/reporter`)
 
 const { emitter } = require(`../../redux`)
 const { boundActionCreators } = require(`../../redux/actions`)
@@ -113,7 +114,9 @@ exports.sourceNodes = ({ createContentDigest, actions, store }) => {
     program.directory,
     `gatsby-config.js`
   )
+  report.log(`internal-data-bridge: start chokidar.watch() instance`)
   chokidar.watch(pathToGatsbyConfig).on(`change`, () => {
+    report.log(`internal-data-bridge: chokidar.watch.change() event`)
     const oldCache = require.cache[require.resolve(pathToGatsbyConfig)]
     try {
       // Delete require cache so we can reload the module.

@@ -4,6 +4,7 @@ const path = require(`path`)
 const { Machine, interpret } = require(`xstate`)
 
 const { createFileNode } = require(`./create-file-node`)
+const report = require(`gatsby-cli/lib/reporter`)
 
 /**
  * Create a state machine to manage Chokidar's not-ready/ready states.
@@ -159,6 +160,7 @@ See docs here - https://www.gatsbyjs.org/packages/gatsby-source-filesystem/
     fsMachine.send(`BOOTSTRAP_FINISHED`)
   })
 
+  report.log(`gatsby-source-filesystem: start chokidar.watch() instance`)
   const watcher = chokidar.watch(pluginOptions.path, {
     ignored: [
       `**/*.un~`,
@@ -175,27 +177,43 @@ See docs here - https://www.gatsbyjs.org/packages/gatsby-source-filesystem/
   })
 
   watcher.on(`add`, path => {
+    report.log(`gatsby-source-filesystem: chokidar.watch.add('${path}') event`)
     fsMachine.send({ type: `CHOKIDAR_ADD`, pathType: `file`, path })
   })
 
   watcher.on(`change`, path => {
+    report.log(
+      `gatsby-source-filesystem: chokidar.watch.change('${path}') event`
+    )
     fsMachine.send({ type: `CHOKIDAR_CHANGE`, pathType: `file`, path })
   })
 
   watcher.on(`unlink`, path => {
+    report.log(
+      `gatsby-source-filesystem: chokidar.watch.unlink('${path}') event`
+    )
     fsMachine.send({ type: `CHOKIDAR_UNLINK`, pathType: `file`, path })
   })
 
   watcher.on(`addDir`, path => {
+    report.log(
+      `gatsby-source-filesystem: chokidar.watch.addDir('${path}') event`
+    )
     fsMachine.send({ type: `CHOKIDAR_ADD`, pathType: `directory`, path })
   })
 
   watcher.on(`unlinkDir`, path => {
+    report.log(
+      `gatsby-source-filesystem: chokidar.watch.unlinkDir('${path}') event`
+    )
     fsMachine.send({ type: `CHOKIDAR_UNLINK`, pathType: `directory`, path })
   })
 
   return new Promise((resolve, reject) => {
     watcher.on(`ready`, () => {
+      report.log(
+        `gatsby-source-filesystem: chokidar.watch.ready() state change, continue...`
+      )
       fsMachine.send({ type: `CHOKIDAR_READY`, resolve, reject })
     })
   })

@@ -231,12 +231,14 @@ const watch = async rootDir => {
     return slash(path.join(module.path, pathRegex))
   })
 
+  report.log(`query-watcher: start chokidar.watch() instance`)
   watcher = chokidar
     .watch([
       slash(path.join(rootDir, `/src/**/*.{js,jsx,ts,tsx}`)),
       ...packagePaths,
     ])
     .on(`change`, path => {
+      report.log(`query-watcher: chokidar.watch.change('${path}') event`)
       debounceCompile()
     })
 

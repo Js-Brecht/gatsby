@@ -2,6 +2,7 @@ const fs = require(`fs-extra`)
 const chokidar = require(`chokidar`)
 const nodePath = require(`path`)
 const { store } = require(`../redux`)
+const report = require(`gatsby-cli/lib/reporter`)
 
 /**
  * copyStaticDirs
@@ -43,13 +44,16 @@ exports.copyStaticDirs = () => {
  */
 exports.syncStaticDir = () => {
   const staticDir = nodePath.join(process.cwd(), `static`)
+  report.log(`get-static-dir: start chokidar.watch() instance`)
   chokidar
     .watch(staticDir)
     .on(`add`, path => {
+      report.log(`get-static-dir: chokidar.watch.add('${path}') event`)
       const relativePath = nodePath.relative(staticDir, path)
       fs.copy(path, `${process.cwd()}/public/${relativePath}`)
     })
     .on(`change`, path => {
+      report.log(`get-static-dir: chokidar.watch.change('${path}') event`)
       const relativePath = nodePath.relative(staticDir, path)
       fs.copy(path, `${process.cwd()}/public/${relativePath}`)
     })

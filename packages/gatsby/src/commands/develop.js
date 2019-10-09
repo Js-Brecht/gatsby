@@ -298,6 +298,7 @@ async function startServer(program, { activity }) {
     slash(directoryPath(path))
   )
 
+  report.log(`develop: start chokidar.watch() instance`)
   chokidar.watch(watchGlobs).on(`change`, async () => {
     await createIndexHtml()
     socket.to(`clients`).emit(`reload`)

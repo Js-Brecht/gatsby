@@ -1,6 +1,7 @@
 const path = require(`path`)
 const fs = require(`fs-extra`)
 const chokidar = require(`chokidar`)
+const report = require(`gatsby-cli/lib/reporter`)
 
 exports.createPagesStatefully = async ({ store, actions }, options, done) => {
   if (process.env.NODE_ENV !== `production`) {
@@ -18,10 +19,19 @@ exports.createPagesStatefully = async ({ store, actions }, options, done) => {
       component: destination,
       path: `/dev-404-page/`,
     })
+    report.log(`dev-404-page: start chokidar.watch() instance`)
     chokidar
       .watch(source)
-      .on(`change`, () => copy())
-      .on(`ready`, () => done())
+      .on(`change`, () => {
+        report.log(`dev-404-page: chokidar.watch.change() event`)
+        copy()
+      })
+      .on(`ready`, () => {
+        report.log(
+          `dev-404-page: chokidar.watch.ready() state change, continue...`
+        )
+        done()
+      })
   } else {
     done()
   }
