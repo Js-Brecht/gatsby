@@ -1,4 +1,4 @@
-const getDevelopmentCertificate = require(`devcert-san`).default
+const getDevelopmentCertificate = require(`devcert`).certificateFor
 const report = require(`gatsby-cli/lib/reporter`)
 const fs = require(`fs`)
 const path = require(`path`)
@@ -36,9 +36,15 @@ module.exports = async ({ name, certFile, keyFile, directory }) => {
 
   report.info(`setting up automatic SSL certificate (may require sudo)\n`)
   try {
-    return await getDevelopmentCertificate(name, {
+    const ssl = await getDevelopmentCertificate(name, {
+      returnCa: true,
       installCertutil: true,
     })
+    if (ssl.ca) process.env.NODE_EXTRA_CA_CERTS = ssl.ca
+    return {
+      key: ssl.key,
+      cert: ssl.cert,
+    }
   } catch (err) {
     report.panic({
       id: `11522`,
