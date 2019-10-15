@@ -403,9 +403,9 @@ module.exports = async (program: any) => {
       })
 
     const isUnspecifiedHost = host === `0.0.0.0` || host === `::`
-    let prettyHost = host,
-      lanUrlForConfig,
-      lanUrlForTerminal
+    let prettyHost = host
+    let lanUrlForConfig
+    let lanUrlForTerminal
     if (isUnspecifiedHost) {
       prettyHost = `localhost`
 
