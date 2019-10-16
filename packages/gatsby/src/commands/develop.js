@@ -355,11 +355,16 @@ module.exports = async (program: any) => {
   // Certs are named after `name` inside the project's package.json.
   // Scoped names are converted from @npm/package-name to npm--package-name
   if (program.https) {
-    program.host =
-      program.host ||
-      program.sitePackageJson.name.replace(`@`, ``).replace(`/`, `--`)
+    let sslHost = ``
+    if (/([0-9]{1,3}\.){3}[0-9]{1,3}/.test(program.host)) {
+      sslHost = `localhost`
+    } else {
+      sslHost =
+        program.host ||
+        program.sitePackageJson.name.replace(`@`, ``).replace(`/`, `--`)
+    }
     program.ssl = await getSslCert({
-      name: program.host,
+      name: sslHost,
       caFile: program[`ca`],
       certFile: program[`cert-file`],
       keyFile: program[`key-file`],
