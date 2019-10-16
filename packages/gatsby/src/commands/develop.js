@@ -365,7 +365,7 @@ module.exports = async (program: any) => {
     }
     program.ssl = await getSslCert({
       name: sslHost,
-      caFile: program[`ca`],
+      caFile: program[`ca-file`],
       certFile: program[`cert-file`],
       keyFile: program[`key-file`],
       directory: program.directory,
