@@ -360,6 +360,7 @@ module.exports = async (program: any) => {
       program.sitePackageJson.name.replace(`@`, ``).replace(`/`, `--`)
     program.ssl = await getSslCert({
       name: program.host,
+      caFile: program[`ca`],
       certFile: program[`cert-file`],
       keyFile: program[`key-file`],
       directory: program.directory,
