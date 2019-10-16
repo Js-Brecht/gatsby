@@ -35,7 +35,9 @@ module.exports = async ({ name, certFile, keyFile, caFile, directory }) => {
     }
   }
 
-  report.info(`setting up automatic SSL certificate (may require sudo)\n`)
+  report.info(
+    `setting up automatic SSL certificate (may require elevated permissions/sudo)\n`
+  )
   try {
     const ssl = await getDevelopmentCertificate(name, {
       returnCa: true,
@@ -44,7 +46,7 @@ module.exports = async ({ name, certFile, keyFile, caFile, directory }) => {
         getWindowsEncryptionPassword: async () => {
           report.info(
             [
-              `A password is required to access the secure certificate authority credentials`,
+              `A password is required to access the secure certificate authority key`,
               `used for signing certificates.`,
               ``,
               `If this is the first time this has run, then this is to set the password`,
