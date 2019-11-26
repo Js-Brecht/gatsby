@@ -40,6 +40,8 @@ module.exports = async ({ name, certFile, keyFile, caFile, directory }) => {
   )
   try {
     const { caPath, key, cert } = await getDevCert(name, {
+      getCaPath: true,
+      skipCertutilInstall: true,
       ui: {
         getWindowsEncryptionPassword: async () => {
           report.info(
