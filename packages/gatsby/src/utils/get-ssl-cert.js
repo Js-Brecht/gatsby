@@ -1,4 +1,4 @@
-const getDevelopmentCertificate = require(`devcert`).certificateFor
+const getDevCert = require(`devcert`).certificateFor
 const report = require(`gatsby-cli/lib/reporter`)
 const fs = require(`fs`)
 const path = require(`path`)
@@ -39,9 +39,7 @@ module.exports = async ({ name, certFile, keyFile, caFile, directory }) => {
     `setting up automatic SSL certificate (may require elevated permissions/sudo)\n`
   )
   try {
-    const ssl = await getDevelopmentCertificate(name, {
-      returnCa: true,
-      installCertutil: true,
+    const { caPath, key, cert } = await getDevCert(name, {
       ui: {
         getWindowsEncryptionPassword: async () => {
           report.info(
@@ -65,10 +63,10 @@ module.exports = async ({ name, certFile, keyFile, caFile, directory }) => {
         },
       },
     })
-    if (ssl.ca) process.env.NODE_EXTRA_CA_CERTS = ssl.ca
+    if (caPath) process.env.NODE_EXTRA_CA_CERTS = caPath
     return {
-      key: ssl.key,
-      cert: ssl.cert,
+      key,
+      cert,
     }
   } catch (err) {
     report.panic({
