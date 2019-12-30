@@ -8,50 +8,148 @@ Gatsby provides an easy way to use a local HTTPS server during development, than
 
 Start the development server using `npm run develop` as usual, and add either the `-S` or `--https` flag.
 
-    $ npm run develop -- --https
+```shell
+$ npm run develop -- --https
+```
 
 ## Setup
 
 When setting up a development SSL certificate for the first time, you may be asked to type in your password after starting the development environment:
 
-    info setting up SSL certificate (may require sudo)
+```text
+info setting up SSL certificate (may require elevated permissions/sudo)
 
-    Password:
+Password:
+```
 
-This is _only_ required the first time you are using Gatsby's HTTPS feature on your machine. After that, certificates will be created on the fly.
+On windows, the prompt will differ:
 
-After typing in your password, `devcert` will attempt to install some software necessary to tell Firefox (and Chrome, only on Linux) to trust your development certificates.
+```text
+A password is required to access the secure certificate authority key
+used for signing certificates.
 
-    Unable to automatically install SSL certificate - please follow the
-    prompts at http://localhost:52175 in Firefox to trust the root certificate
-    See https://github.com/davewasmer/devcert#how-it-works for more details
-    -- Press <Enter> once you finish the Firefox prompts --
+If this is the first time this has run, then this is to set the password
+for future use.  If any new certificates are signed later, you will need
+to use this same password.
 
-If you wish to support Firefox (or Chrome on Linux), visit [localhost:52175](http://localhost:52175) in Firefox and follow the point-and-click wizard. Otherwise, you may press enter without following the prompts. **Reminder: you'll only need to do this once per machine.**
+Please enter the CA password:
+```
 
-Now open the development server at [https://localhost:8000](https://localhost:8000) and enjoy the HTTPS goodness ✨. Of course, you may change the port according to your setup.
+This is _only_ required the first time you are using Gatsby's HTTPS feature on your machine, and when you are creating a brand new certificate.
+
+After typing in your password, `devcert` will install the CA certificate in your operating system trusted certs store. For various browsers (Firefox, and Chrome on Linux) it needs to use a utility called `certutil`.
+
+### In case `certutil` is not installed on your machine
+
+`devcert` is configured to not install `certutil` automatically. You will need to do that yourself, if you want it to be able to setup the trust automatically.
+
+To install `certutil`, you need to install the `nss tools` package(s). The exact procedure will differ depending on your operating system.
+
+On a linux OS, you should be able to simply run one of the following, depending on the flavor:
+
+```shell
+# Debian based (Ubuntu)
+sudo apt install libnss3-tools
+
+# RHEL based (Fedora)
+sudo yum install nss-tools
+
+# OpenSuse
+sudo zypper install mozilla-nss-tools
+```
+
+On MacOS, you should be able to run:
+
+```shell
+brew install nss
+```
+
+Windows is a different story. There's not too many precompiled libraries out there, so the only option would be to go searching for one, or compile it yourself. Because of how difficult Windows makes it, `devcert` will not even try to update the Firefox trust store automatically; instead, it will fallback to using the "Firefox wizard", detailed below.
+
+If you choose not to install `certutil`, you may get the following errors/prompts:
+
+- If you use Chrome on Linux:
+
+  ```text
+  WARNING: It looks like you have Chrome installed, but you specified
+  'skipCertutilInstall: true'. Unfortunately, without installing
+  certutil, it's impossible get Chrome to trust devcert's certificates
+  The certificates will work, but Chrome will continue to warn you that
+  they are untrusted.
+  ```
+
+- If you have Firefox installed, `devcert` will try to utilize Firefox itself to trust the certificate
+
+  ```text
+  devcert was unable to automatically configure Firefox. You'll need to
+  complete this process manually. Don't worry though - Firefox will walk
+  you through it.
+
+  When you're ready, hit any key to continue. Firefox will launch and
+  display a wizard to walk you through how to trust the devcert
+  certificate. When you are finished, come back here and we'll finish up.
+  (If Firefox doesn't start, go ahead and start it and navigate to
+  http://localhost:52175 in a new tab.)
+
+  If you are curious about why all this is necessary, check out
+  https://github.com/davewasmer/devcert#how-it-works
+  <Press any key to launch Firefox wizard>
+  ```
+
+  - You can press enter here, and it will launch Firefox for you.
+
+  - If you wish to have trust support on Firefox, tell the point-and-click wizard `this certificate can identify websites`, and click OK. Otherwise, you may hit cancel and close the browser, then key return to finish building. **Reminder: you'll only need to do this once per machine.**
+
+### After `devcert` setup process
+
+You can open the development server at [https://localhost:8000](https://localhost:8000) and enjoy the HTTPS goodness ✨. Of course, you may change the port according to your setup.
 
 Find out more about [how devcert works](https://github.com/davewasmer/devcert#how-it-works).
+
+### Management of certificates generated by devcert
+
+If you want to do some maintenance/cleanup of the certificates generated by `devcert`, please refer to [devcert-cli](https://github.com/davewasmer/devcert-cli/blob/master/README.md)
 
 ## Custom Key and Certificate Files
 
 You may find that you need a custom key and certificate file for https if you use multiple
 machines for development (or if your dev environment is containerized in Docker).
 
-If you need to use a custom https setup, you can pass the `--https`, `--key-file` and
-`--cert-file` flags to `npm run develop`.
+If you need to use a custom https setup, you can pass the `--https`, `--key-file`,
+`--cert-file`, and `--ca-file` flags to `npm run develop`.
 
-- `--cert-file` [relative path to ssl certificate file]
-- `--key-file` [relative path to ssl key file]
+- `--cert-file` [relative/absolute path to ssl certificate file]
+- `--key-file` [relative/absolute path to ssl key file]
+- `--ca-file` [relative/absolute path to ssl certificate authority file]
 
-See the example command:
+See the example commands below:
 
-```shell
-$ gatsby develop --https --key-file ../relative/path/to/key.key --cert-file ../relative/path/to/cert.crt
-```
+- Using `npm run develop`
 
-in most cases, the `--https` passed by itself is easier and more convenient to get local https.
+  ```shell
+  # Using relative paths
+  $ npm run develop -- --https --key-file ../relative/path/to/key.key --cert-file ../relative/path/to/cert.crt --ca-file ../relative/path/to/ca.crt
+
+  # Or using absolute paths
+  $ npm run develop -- --https --key-file /absolute/path/to/key.key --cert-file /absolute/path/to/cert.crt --ca-file /absolute/path/to/ca.crt
+  ```
+
+- Alternatively, you can run the development server using the gatsby cli
+
+  ```shell
+  # Using relative paths
+  $ gatsby develop --https --key-file ../relative/path/to/key.key --cert-file ../relative/path/to/cert.crt --ca-file ../relative/path/to/ca.crt
+
+  # Or using absolute paths
+  $ gatsby develop --https --key-file /absolute/path/to/key.key --cert-file /absolute/path/to/cert.crt --ca-file /absolute/path/to/ca.crt
+  ```
+
+Usage of the `--ca-file` flag is only required if your certificate is signed by a certificate authority.
+
+If your certificate is self-signed, then do not include the `--ca-file` flag. Also, if you want your browser to trust a self-signed certificate, you will need to add it to your operating system (or browser's, in Firefox's case) root certificate store in order for your browser to trust it.
+
+In most cases, the `--https` passed by itself is easier and more convenient to get local https.
 
 ---
 
-Keep in mind that the automatic certificates issued with the `--https` flag are explicitly issued to `localhost` and will only be accepted there. Using it together with the `--host` option will likely result in browser warnings.
+Automatic certificates issued with the `--https` flag are issued to `localhost` by default, unless you have used the `--host` flag. If you have, a record in your hosts file will automatically be configured to point the defined host to `127.0.0.1`. At this time, ip addresses defined by `--host` are not supported.

@@ -380,12 +380,17 @@ module.exports = async (program: IProgram) => {
   // Scoped names are converted from @npm/package-name to npm--package-name.
   // If the name is unavailable, generate one using the current working dir.
   if (program.https) {
-    const name = program.sitePackageJson.name
-      ? program.sitePackageJson.name.replace(`@`, ``).replace(`/`, `--`)
-      : process.cwd().replace(/[^A-Za-z0-9]/g, `-`)
-
+    let sslHost = ``
+    if (/([0-9]{1,3}\.){3}[0-9]{1,3}/.test(program.host)) {
+      sslHost = `localhost`
+    } else {
+      sslHost =
+        program.host ||
+        program.sitePackageJson.name.replace(`@`, ``).replace(`/`, `--`)
+    }
     program.ssl = await getSslCert({
-      name,
+      name: sslHost,
+      caFile: program[`ca-file`],
       certFile: program[`cert-file`],
       keyFile: program[`key-file`],
       directory: program.directory,
@@ -443,9 +448,9 @@ module.exports = async (program: IProgram) => {
       })
 
     const isUnspecifiedHost = host === `0.0.0.0` || host === `::`
-    let prettyHost = host,
-      lanUrlForConfig,
-      lanUrlForTerminal
+    let prettyHost = host
+    let lanUrlForConfig
+    let lanUrlForTerminal
     if (isUnspecifiedHost) {
       prettyHost = `localhost`
 
